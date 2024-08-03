@@ -1,9 +1,8 @@
 import http from "http";
 import { Server, Socket } from "socket.io";
 import { currentLoad, mem, fsSize } from "systeminformation";
-import Docker from "dockerode";
 require("dotenv").config();
-const docker = new Docker();
+
 const server = http.createServer();
 const io = new Server(server, { cors: { origin: "*" } });
 
@@ -25,9 +24,6 @@ io.on("connection", (socket: Socket) => {
         availableInGB: (partition.available / (1024 * 1024 * 1024)).toFixed(2),
       }));
 
-      // Получаем информацию о Docker контейнерах
-      const containers = await docker.listContainers();
-
       const systemInfo = {
         cpu: cpuInfo.currentLoad.toFixed(2),
         ram: {
@@ -42,7 +38,6 @@ io.on("connection", (socket: Socket) => {
         disk: {
           space: diskInfoInGB,
         },
-        dockerContainers: containers,
       };
 
       // Отправляем информацию о системе обратно клиенту
